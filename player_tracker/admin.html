@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Kuronami Tracker - Admin</title>
+    <style>
+        :root {
+            --bg: #0b1120;
+            --card: #1e293b;
+            --accent: #ff4655;
+            --gold: #facc15;
+            --silver: #cbd5f5;
+            --bronze: #b45309;
+        }
+
+        body {
+            margin:0;
+            font-family: 'Segoe UI', sans-serif;
+            background: radial-gradient(circle at top, #0f172a, #020617);
+            color:white;
+        }
+
+        .navbar {
+            display:flex;
+            justify-content:space-between;
+            align-items: center;
+            padding:15px 40px;
+            background:rgba(0,0,0,0.6);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-weight:bold;
+            color:var(--accent);
+            text-decoration: none;
+            font-size: 20px;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            border: 2px solid #ff4655;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .navbar a:hover {
+            background: #ff4655;
+        }
+
+        .dashboard {
+            max-width:1000px;
+            margin:50px auto;
+            background:rgba(30,41,59,0.6);
+            padding:30px;
+            border-radius:12px;
+            backdrop-filter: blur(10px);
+        }
+
+        h2 {
+            border-bottom: 1px solid #334155;
+            padding-bottom: 10px;
+            margin-top: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #cbd5f5;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #334155;
+            background: #0b1120;
+            color: white;
+            box-sizing: border-box;
+        }
+
+        button.submit-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        button.submit-btn:hover {
+            background: #e03543;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #334155;
+            text-align: center;
+        }
+
+        .btn-delete {
+            background: transparent;
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            padding: 5px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-delete:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        .row {
+            display: flex;
+            gap: 20px;
+        }
+        .col {
+            flex: 1;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <a href="index.html" class="logo">Kuronami Tracker</a>
+    <a href="index.html">← Back to Dashboard</a>
+</div>
+
+<div class="dashboard">
+    <h1>Admin Panel - Manage Data</h1>
+
+    <div class="row">
+        <!-- ADD PLAYER -->
+        <div class="col">
+            <h2>Add Player</h2>
+            <div class="form-group">
+                <label>Player Name</label>
+                <input type="text" id="newPlayerName" placeholder="e.g. TenZ">
+            </div>
+            <button class="submit-btn" onclick="addPlayer()">Add Player</button>
+        </div>
+
+        <!-- ADD MATCH -->
+        <div class="col">
+            <h2>Add Match</h2>
+            <div class="form-group">
+                <label>Date</label>
+                <input type="date" id="newMatchDate">
+            </div>
+            <div class="form-group">
+                <label>Map</label>
+                <input type="text" id="newMatchMap" placeholder="e.g. Bind">
+            </div>
+            <button class="submit-btn" onclick="addMatch()">Add Match</button>
+        </div>
+    </div>
+
+    <!-- ADD STATS -->
+    <h2>Add Player Stats for Match</h2>
+    <div class="row">
+        <div class="col">
+            <div class="form-group">
+                <label>Player ID</label>
+                <input type="number" id="statPlayerId" placeholder="Player ID">
+            </div>
+            <div class="form-group">
+                <label>Match ID</label>
+                <input type="number" id="statMatchId" placeholder="Match ID">
+            </div>
+            <div class="form-group">
+                <label>Result</label>
+                <select id="statResult">
+                    <option value="win">Win</option>
+                    <option value="loss">Loss</option>
+                </select>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <label>Kills</label>
+                <input type="number" id="statKills" value="0">
+            </div>
+            <div class="form-group">
+                <label>Deaths</label>
+                <input type="number" id="statDeaths" value="0">
+            </div>
+            <div class="form-group">
+                <label>Assists</label>
+                <input type="number" id="statAssists" value="0">
+            </div>
+        </div>
+    </div>
+    <button class="submit-btn" onclick="addStats()">Add Stats</button>
+
+    <!-- MANAGE DATA LISTS -->
+    <div class="row" style="margin-top: 40px;">
+        <div class="col">
+            <h2>Manage Players</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="playerList"></tbody>
+            </table>
+        </div>
+        <div class="col">
+            <h2>Manage Matches</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Date</th>
+                        <th>Map</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="matchList"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API = "";
+
+    async function loadData() {
+        // Load Players
+        let pRes = await fetch(API + "/players");
+        let pData = await pRes.json();
+        let pHtml = "";
+        pData.forEach(p => {
+            pHtml += `<tr>
+                <td>${p.player_id}</td>
+                <td>${p.name}</td>
+                <td><button class="btn-delete" onclick="deletePlayer(${p.player_id})">Delete</button></td>
+            </tr>`;
+        });
+        document.getElementById("playerList").innerHTML = pHtml;
+
+        // Load Matches
+        let mRes = await fetch(API + "/matches");
+        let mData = await mRes.json();
+        let mHtml = "";
+        mData.forEach(m => {
+            mHtml += `<tr>
+                <td>${m.match_id}</td>
+                <td>${m.date}</td>
+                <td>${m.map}</td>
+                <td><button class="btn-delete" onclick="deleteMatch(${m.match_id})">Delete</button></td>
+            </tr>`;
+        });
+        document.getElementById("matchList").innerHTML = mHtml;
+    }
+
+    async function addPlayer() {
+        const name = document.getElementById("newPlayerName").value;
+        if (!name) return alert("Enter a name");
+
+        await fetch(API + "/players", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: name })
+        });
+        document.getElementById("newPlayerName").value = "";
+        loadData();
+    }
+
+    async function deletePlayer(id) {
+        if (!confirm("Are you sure? This deletes their stats too.")) return;
+        await fetch(API + "/players/" + id, { method: "DELETE" });
+        loadData();
+    }
+
+    async function addMatch() {
+        const date = document.getElementById("newMatchDate").value;
+        const map = document.getElementById("newMatchMap").value;
+        if (!date || !map) return alert("Enter date and map");
+
+        await fetch(API + "/matches", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ date: date, map: map })
+        });
+        document.getElementById("newMatchDate").value = "";
+        document.getElementById("newMatchMap").value = "";
+        loadData();
+    }
+
+    async function deleteMatch(id) {
+        if (!confirm("Are you sure? This deletes stats for this match too.")) return;
+        await fetch(API + "/matches/" + id, { method: "DELETE" });
+        loadData();
+    }
+
+    async function addStats() {
+        const pId = document.getElementById("statPlayerId").value;
+        const mId = document.getElementById("statMatchId").value;
+        const result = document.getElementById("statResult").value;
+        const k = document.getElementById("statKills").value;
+        const d = document.getElementById("statDeaths").value;
+        const a = document.getElementById("statAssists").value;
+
+        if (!pId || !mId) return alert("Enter Player ID and Match ID");
+
+        let res = await fetch(API + "/stats", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                player_id: parseInt(pId),
+                match_id: parseInt(mId),
+                kills: parseInt(k),
+                deaths: parseInt(d),
+                assists: parseInt(a),
+                result: result
+            })
+        });
+
+        if (res.ok) {
+            alert("Stats added!");
+            document.getElementById("statPlayerId").value = "";
+            document.getElementById("statMatchId").value = "";
+            document.getElementById("statKills").value = 0;
+            document.getElementById("statDeaths").value = 0;
+            document.getElementById("statAssists").value = 0;
+        } else {
+            let error = await res.json();
+            alert("Error: " + error.detail);
+        }
+    }
+
+    // Init
+    loadData();
+</script>
+
+</body>
+</html>
